@@ -1,0 +1,19 @@
+{
+  "name": "api_ui",
+  "version": "1.0.0",
+  "description": "simplified API user interface",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kbroncel/api_ui.git"
+  },
+  "author": "Karol Broncel",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kbroncel/api_ui/issues"
+  },
+  "homepage": "https://github.com/kbroncel/api_ui#readme"
+}
