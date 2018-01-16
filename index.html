@@ -5,8 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
-</head>
-<body>
+    <link rel="stylesheet" href="./assets/css/main.css">
+    <link rel="stylesheet" href="./assets/css/prism.css">
     
+</head>
+<body class="api_ui">
+    <header>
+        <h1>Simplified API user interface</h1>
+    </header>
+    <h2>Advertiser List</h2>
+    <section class="">
+        <select name="method" id="request_method">
+        </select>
+        <input type="text" name="url" id="request_url">
+        <select name="format" id="request_format">
+        </select>
+        <button id="request_send">Send request</button>
+    </section>
+    <pre id="response" class="">
+    </pre>
+    <script src="./assets/js/main.js"></script>
 </body>
 </html>
