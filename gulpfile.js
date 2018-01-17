@@ -26,7 +26,7 @@ gulp.task("watch", function () {
     gulp.watch("./src/js/**/*.js", ["js"]);
 });
 
-gulp.task("build", ["uglify", "copyCss", "copyResource", "copyHtml", "copyServer"]);
+gulp.task("build", ["sass", "js", "uglify", "copyCss", "copyResource", "copyHtml", "copyServer"]);
 
 gulp.task("uglify", function(){
     return gulp.src("./assets/js/*.js")
