@@ -3,30 +3,30 @@
 const app = {
     //app state object, contains data used to render and inside other methods
     state: {
-        method: 'GET',
-        url: './../resources/response',
-        format: 'JSON',
-        possibleMethods: [
+        services: [
             {
-                alias: 'GET',
-                value: 'GET'
-            }
-        ],
-        possibleFormats: [
-            {
-                alias: 'JSON',
-                value: 'JSON'
-            },
-            {
-                alias: 'XML',
-                value: 'XML'
+                name: "Advertiser List",
+                selectedMethod: 'GET',
+                selectedFormat: 'JSON',
+                url: './../resources/response',
+                possibleMethods: [
+                    {
+                        alias: 'GET',
+                        value: 'GET'
+                    }
+                ],
+                possibleFormats: [
+                    {
+                        alias: 'JSON',
+                        value: 'JSON'
+                    },
+                    {
+                        alias: 'XML',
+                        value: 'XML'
+                    }
+                ]
             }
         ]
-    },
-    // sets application inner state attributes, takes attribute name and value, returns app state
-    setState: function (name, value) {
-        this.state[name] = value;
-        return this.state;
     },
     // promise that takes a chosen method (GET, POST, etc.) and a url address and returns a promise object
     // resolves with request response
@@ -60,44 +60,76 @@ const app = {
     // takes an array of alias, value pairs and returns array of option domNodes
     getOptionDomNodes: function (optionsArray) {
         return optionsArray.map(option => {
-            let optionNode = document.createElement("option");
+            const optionNode = document.createElement("option");
             optionNode.text = option.alias;
             optionNode.value = option.value;
             return optionNode;
         })
+    },
+    // takes a string and returns a h2 with that title
+    getHeaderNode: function (title) {
+        const headerNode = document.createElement("h2");
+        headerNode.innerHTML = title;
+        return headerNode;
+    },
+    // takes a config object 
+    // {
+    //     context: service object,
+    //     oprtions: string - attribute identifier of options array in context object,
+    //     parameter: string - attribute identifier chosen option in context object
+    // } 
+    // returns a select node containing options based on provided config object
+    getSelectNode: function (config) {
+        const selectNode = document.createElement("select");
+        this.getOptionDomNodes(config.context[config.options]).forEach((option) => {
+            selectNode.add(option);
+        })
+        selectNode.value = config.context[config.parameter];
+        selectNode.addEventListener('change', (event) => {
+            config.context[config.parameter] = event.target.value;
+        })
+        return selectNode;
+    },
+    // takes string and returns a span with provided text (url in that case)
+    getUrlNode: function (url) {
+        const urlNode = document.createElement("span");
+        urlNode.innerHTML = url;
+        return urlNode;
+    },
+    // takes a service object and a target node
+    // on click sends request based on actual service object state
+    // renders results inside target node
+    getButtonNode: function (service, targetNode) {
+        const buttonNode = document.createElement("button");
+        buttonNode.innerHTML = "Send request";
+        buttonNode.addEventListener("click", () => {
+            app.sendRequest(service.selectedMethod, `${service.url}.${service.selectedFormat}`).then((result) => {
+                targetNode.innerHTML = this.prettifyResponse(result);
+            })
+                .catch((error) => {
+                    targetNode.innerHTML = this.prettifyResponse(error);
+                })
+        })
+        return buttonNode;
+    },
+    // returns Pre tag, used as target node to render request result in it
+    getPreNode: function () {
+        const preNode = document.createElement("pre");
+        return preNode;
     }
 }
 
-const requestMehtodSelect = document.getElementById('request_method');
-app.getOptionDomNodes(app.state.possibleMethods).forEach((option) => {
-    requestMehtodSelect.add(option)
-})
-requestMehtodSelect.value = app.state.method;
-requestMehtodSelect.addEventListener('change', (event) => {
-    app.setState("method", event.target.value);
-})
+app.state.services.forEach(service => {
+    const container = document.getElementById("servicesContainer");
 
-const requestFormatSelect = document.getElementById('request_format');
-app.getOptionDomNodes(app.state.possibleFormats).forEach((option) => {
-    requestFormatSelect.add(option)
-})
-requestFormatSelect.value = app.state.format;
-requestFormatSelect.addEventListener('change', (event) => {
-    app.setState("format", event.target.value);
-})
+    const section = document.createElement("section");
+    section.appendChild(app.getSelectNode({ context: service, options: "possibleMethods", parameter: "selectedMethod" }));
+    section.appendChild(app.getUrlNode(service.url));
+    section.appendChild(app.getSelectNode({ context: service, options: "possibleFormats", parameter: "selectedFormat" }));
+    const pre = app.getPreNode();
+    section.appendChild(app.getButtonNode(service, pre));
 
-const requestUrlInput = document.getElementById('request_url');
-requestUrlInput.value = app.state.url
-requestUrlInput.addEventListener('blur', (event) => {
-    app.setState("url", event.target.value);
-})
-
-const sendRequestBtn = document.getElementById('request_send');
-sendRequestBtn.addEventListener('click', () => {
-    app.sendRequest(app.state.method, `${app.state.url}.${app.state.format}`).then((result) => {
-        document.getElementById('response').innerHTML = app.prettifyResponse(result);
-    })
-        .catch((error) => {
-            document.getElementById('response').innerHTML = app.prettifyResponse(error);
-        })
+    container.appendChild(app.getHeaderNode(service.name));
+    container.appendChild(section);
+    container.appendChild(pre);
 })
