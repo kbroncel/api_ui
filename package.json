@@ -4,7 +4,7 @@
   "description": "simplified API user interface",
   "main": "index.js",
   "scripts": {
-    "test": "",
+    "test": "jest --watch",
     "build": "gulp build"
   },
   "repository": {
@@ -27,7 +27,9 @@
     "gulp-browserify": "^0.5.1",
     "gulp-html-replace": "^1.6.2",
     "gulp-sass": "^3.1.0",
-    "gulp-uglify": "^3.0.0"
+    "gulp-sequence": "^1.0.0",
+    "gulp-uglify": "^3.0.0",
+    "jest": "^22.1.2"
   },
   "dependencies": {
     "gulp-concat-css": "^3.0.0",

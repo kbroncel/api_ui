@@ -7,6 +7,7 @@ const babel = require("gulp-babel");
 const uglify = require("gulp-uglify");
 const htmlreplace = require("gulp-html-replace");
 const concatCss = require("gulp-concat-css");
+const gulpSequence = require("gulp-sequence");
 
 gulp.task("sass", function () {
     return gulp.src("./src/scss/**/*.scss")
@@ -15,7 +16,7 @@ gulp.task("sass", function () {
 });
 
 gulp.task("js", function () {
-    return gulp.src("./src/js/**/*.js")
+    return gulp.src("./src/js/*.js")
         .pipe(browserify())
         .pipe(babel({ presets: ["env"] }))
         .pipe(gulp.dest("./assets/js"));
@@ -23,10 +24,12 @@ gulp.task("js", function () {
 
 gulp.task("watch", function () {
     gulp.watch("./src/scss/**/*.scss", ["sass"]);
-    gulp.watch("./src/js/**/*.js", ["js"]);
+    gulp.watch("./src/js/*.js", ["js"]);
 });
 
-gulp.task("build", ["sass", "js", "uglify", "copyCss", "copyResource", "copyHtml", "copyServer"]);
+gulp.task("build", gulpSequence(
+    ["sass", "js"], "uglify", ["copyCss", "copyResource", "copyHtml", "copyServer"]
+));
 
 gulp.task("uglify", function(){
     return gulp.src("./assets/js/*.js")

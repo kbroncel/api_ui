@@ -1,32 +1,9 @@
 //global app object, used to keep global namespace clean
+const importedState = require("./state");
+
 const app = {
     //app state object, contains data used to render and inside other methods
-    state: {
-        services: [
-            {
-                name: "Advertiser List",
-                selectedMethod: 'GET',
-                selectedFormat: 'JSON',
-                url: './../resources/response',
-                possibleMethods: [
-                    {
-                        alias: 'GET',
-                        value: 'GET'
-                    }
-                ],
-                possibleFormats: [
-                    {
-                        alias: 'JSON',
-                        value: 'JSON'
-                    },
-                    {
-                        alias: 'XML',
-                        value: 'XML'
-                    }
-                ]
-            }
-        ]
-    },
+    state: importedState,
     // promise that takes a chosen method (GET, POST, etc.) and a url address and returns a promise object
     // resolves with request response
     // rejects with request error
