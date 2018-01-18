@@ -38,7 +38,7 @@ possibleFormat:
 
 <p>As for next steps in this app development. 
 <ul>
-<li>Hooking it in with real back-end is probably first thing (shouldn't cause any problems).</li>
+<li>Hooking it in with real back-end is probably first thing (shouldn't cause any problems)</li>
 <li>UI could be better, didn't got time to polish it properly</li>
 <li>Tests should be added to check if it still works after changes</li>
 </ul>
