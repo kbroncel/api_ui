@@ -1,13 +1,12 @@
-//global app object, used to keep global namespace clean
-const importedState = require("./state");
-
-const app = {
-    //app state object, contains data used to render and inside other methods
-    state: importedState,
+class App {
+    constructor(serviceArray){
+        //app state object, contains data used to render and inside other methods
+        this.state= serviceArray;
+    }
     // promise that takes a chosen method (GET, POST, etc.) and a url address and returns a promise object
     // resolves with request response
     // rejects with request error
-    sendRequest: function (method, url) {
+    sendRequest(method, url) {
         const promise = new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
             xhr.open(method, url);
@@ -25,29 +24,29 @@ const app = {
             xhr.send();
         });
         return promise;
-    },
+    }
     // takes a xhrHttp object and returns render ready string
-    prettifyResponse: function (xhrHttp) {
+    prettifyResponse(xhrHttp) {
         const Prism = require('prismjs');
         const meta = `http ${xhrHttp.status} ${xhrHttp.statusText}`
         const html = Prism.highlight(xhrHttp.responseText, Prism.languages.javascript);
         return `${meta} <br/> ${html}`;
-    },
+    }
     // takes an array of alias, value pairs and returns array of option domNodes
-    getOptionDomNodes: function (optionsArray) {
+    getOptionDomNodes(optionsArray) {
         return optionsArray.map(option => {
             const optionNode = document.createElement("option");
             optionNode.text = option.alias;
             optionNode.value = option.value;
             return optionNode;
         })
-    },
+    }
     // takes a string and returns a h2 with that title
-    getHeaderNode: function (title) {
+    getHeaderNode(title) {
         const headerNode = document.createElement("h2");
         headerNode.innerHTML = title;
         return headerNode;
-    },
+    }
     // takes a config object 
     // {
     //     context: service object,
@@ -55,7 +54,7 @@ const app = {
     //     parameter: string - attribute identifier chosen option in context object
     // } 
     // returns a select node containing options based on provided config object
-    getSelectNode: function (config) {
+    getSelectNode(config) {
         const selectNode = document.createElement("select");
         this.getOptionDomNodes(config.context[config.options]).forEach((option) => {
             selectNode.add(option);
@@ -65,21 +64,21 @@ const app = {
             config.context[config.parameter] = event.target.value;
         })
         return selectNode;
-    },
+    }
     // takes string and returns a span with provided text (url in that case)
-    getUrlNode: function (url) {
+    getUrlNode(url) {
         const urlNode = document.createElement("span");
         urlNode.innerHTML = url;
         return urlNode;
-    },
+    }
     // takes a service object and a target node
     // on click sends request based on actual service object state
     // renders results inside target node
-    getButtonNode: function (service, targetNode) {
+    getButtonNode(service, targetNode) {
         const buttonNode = document.createElement("button");
         buttonNode.innerHTML = "Send request";
         buttonNode.addEventListener("click", () => {
-            app.sendRequest(service.selectedMethod, `${service.url}.${service.selectedFormat}`).then((result) => {
+            this.sendRequest(service.selectedMethod, `${service.url}.${service.selectedFormat}`).then((result) => {
                 targetNode.innerHTML = this.prettifyResponse(result);
             })
                 .catch((error) => {
@@ -87,12 +86,12 @@ const app = {
                 })
         })
         return buttonNode;
-    },
+    }
     // returns Pre tag, used as target node to render request result in it
-    getPreNode: function () {
+    getPreNode() {
         const preNode = document.createElement("pre");
         return preNode;
     }
 }
 
-module.exports = app;
+module.exports = App;

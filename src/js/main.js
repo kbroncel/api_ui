@@ -1,16 +1,41 @@
-const app = require("./api_ui");
+const App = require("./api_ui");
+const Service = require("./service");
 
-app.state.services.forEach(service => {
+const testService = new Service(
+    "Advertiser List",
+    './../resources/response',
+    'GET',
+    'JSON',
+    [
+        {
+            alias: 'GET',
+            value: 'GET'
+        }
+    ],
+    [
+        {
+            alias: 'JSON',
+            value: 'JSON'
+        },
+        {
+            alias: 'XML',
+            value: 'XML'
+        }
+    ]
+)
+const testApp = new App([testService]);
+
+testApp.state.forEach(service => {
     const container = document.getElementById("servicesContainer");
 
     const section = document.createElement("section");
-    section.appendChild(app.getSelectNode({ context: service, options: "possibleMethods", parameter: "selectedMethod" }));
-    section.appendChild(app.getUrlNode(service.url));
-    section.appendChild(app.getSelectNode({ context: service, options: "possibleFormats", parameter: "selectedFormat" }));
-    const pre = app.getPreNode();
-    section.appendChild(app.getButtonNode(service, pre));
+    section.appendChild(testApp.getSelectNode({ context: service, options: "possibleMethods", parameter: "selectedMethod" }));
+    section.appendChild(testApp.getUrlNode(service.url));
+    section.appendChild(testApp.getSelectNode({ context: service, options: "possibleFormats", parameter: "selectedFormat" }));
+    const pre = testApp.getPreNode();
+    section.appendChild(testApp.getButtonNode(service, pre));
 
-    container.appendChild(app.getHeaderNode(service.name));
+    container.appendChild(testApp.getHeaderNode(service.name));
     container.appendChild(section);
     container.appendChild(pre);
 })
