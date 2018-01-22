@@ -837,20 +837,107 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 				document.addEventListener('DOMContentLoaded', self.Prism.fileHighlight);
 			})();
 		}).call(this, typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {});
-	}, {}], 2: [function (require, module, exports) {
-		var App = function () {
-			function App(serviceArray) {
-				_classCallCheck(this, App);
+	}, {}], 2: [function (require, module, exports) {}, {}], 3: [function (require, module, exports) {
+		var App = require("./api_ui");
+		var Service = require("./service");
 
-				//app state object, contains data used to render and inside other methods
-				this.state = serviceArray;
+		var testService = new Service("Advertiser List", './../resources/response', 'GET', 'JSON', [{
+			alias: 'GET',
+			value: 'GET'
+		}], [{
+			alias: 'JSON',
+			value: 'JSON'
+		}, {
+			alias: 'XML',
+			value: 'XML'
+		}]);
+
+		var container = document.getElementById("servicesContainer");
+		container.appendChild(testService.getServiceDom());
+	}, { "./api_ui": 2, "./service": 4 }], 4: [function (require, module, exports) {
+		var Service = function () {
+			function Service(name, url, selectedMethod, selectedFormat, possibleMethods, possibleFormats) {
+				_classCallCheck(this, Service);
+
+				this.name = name;
+				this.url = url;
+				this.selectedMethod = selectedMethod;
+				this.selectedFormat = selectedFormat;
+				this.possibleMethods = possibleMethods;
+				this.possibleFormats = possibleFormats;
 			}
-			// promise that takes a chosen method (GET, POST, etc.) and a url address and returns a promise object
-			// resolves with request response
-			// rejects with request error
 
+			_createClass(Service, [{
+				key: "setSelectedFormat",
+				value: function setSelectedFormat(format) {
+					this.selectedFormat = format;
+				}
+			}, {
+				key: "setSelectedMethod",
+				value: function setSelectedMethod(method) {
+					this.selectedMethod = method;
+				}
+				// returns a select node containing options based on provided config object
 
-			_createClass(App, [{
+			}, {
+				key: "getSelectNode",
+				value: function getSelectNode(values, callback) {
+					var selectNode = document.createElement("select");
+					this.getOptionDomNodes(values).forEach(function (option) {
+						selectNode.add(option);
+					});
+					// selectNode.value = this.selectedFormat;
+					selectNode.addEventListener('change', function (event) {
+						callback(event.target.value);
+					});
+					return selectNode;
+				}
+				// takes an array of alias, value pairs and returns array of option domNodes
+
+			}, {
+				key: "getOptionDomNodes",
+				value: function getOptionDomNodes(optionsArray) {
+					return optionsArray.map(function (option) {
+						var optionNode = document.createElement("option");
+						optionNode.text = option.alias;
+						optionNode.value = option.value;
+						return optionNode;
+					});
+				}
+			}, {
+				key: "getMethodNode",
+				value: function getMethodNode() {
+					return this.getSelectNode(this.possibleMethods, this.setSelectedMethod.bind(this));
+				}
+			}, {
+				key: "getFormatNode",
+				value: function getFormatNode() {
+					return this.getSelectNode(this.possibleFormats, this.setSelectedFormat.bind(this));
+				}
+				// returns a span with provided text (url in that case)
+
+			}, {
+				key: "getUrlNode",
+				value: function getUrlNode() {
+					var urlNode = document.createElement("span");
+					urlNode.innerHTML = this.url;
+					return urlNode;
+				}
+				// takes a xhrHttp object and returns render ready string
+
+			}, {
+				key: "prettifyResponse",
+				value: function prettifyResponse(xhrHttp) {
+					var Prism = require('prismjs');
+					var meta = "http " + xhrHttp.status + " " + xhrHttp.statusText;
+					var html = Prism.highlight(xhrHttp.responseText, Prism.languages.javascript);
+					return meta + " <br/> " + html;
+				}
+				// promise that takes a chosen method (GET, POST, etc.) and a url address and returns a promise object
+				// resolves with request response
+				// rejects with request error
+
+			}, {
 				key: "sendRequest",
 				value: function sendRequest(method, url) {
 					var promise = new Promise(function (resolve, reject) {
@@ -870,86 +957,34 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					});
 					return promise;
 				}
-				// takes a xhrHttp object and returns render ready string
-
-			}, {
-				key: "prettifyResponse",
-				value: function prettifyResponse(xhrHttp) {
-					var Prism = require('prismjs');
-					var meta = "http " + xhrHttp.status + " " + xhrHttp.statusText;
-					var html = Prism.highlight(xhrHttp.responseText, Prism.languages.javascript);
-					return meta + " <br/> " + html;
-				}
-				// takes an array of alias, value pairs and returns array of option domNodes
-
-			}, {
-				key: "getOptionDomNodes",
-				value: function getOptionDomNodes(optionsArray) {
-					return optionsArray.map(function (option) {
-						var optionNode = document.createElement("option");
-						optionNode.text = option.alias;
-						optionNode.value = option.value;
-						return optionNode;
-					});
-				}
-				// takes a string and returns a h2 with that title
-
-			}, {
-				key: "getHeaderNode",
-				value: function getHeaderNode(title) {
-					var headerNode = document.createElement("h2");
-					headerNode.innerHTML = title;
-					return headerNode;
-				}
-				// takes a config object 
-				// {
-				//     context: service object,
-				//     oprtions: string - attribute identifier of options array in context object,
-				//     parameter: string - attribute identifier chosen option in context object
-				// } 
-				// returns a select node containing options based on provided config object
-
-			}, {
-				key: "getSelectNode",
-				value: function getSelectNode(config) {
-					var selectNode = document.createElement("select");
-					this.getOptionDomNodes(config.context[config.options]).forEach(function (option) {
-						selectNode.add(option);
-					});
-					selectNode.value = config.context[config.parameter];
-					selectNode.addEventListener('change', function (event) {
-						config.context[config.parameter] = event.target.value;
-					});
-					return selectNode;
-				}
-				// takes string and returns a span with provided text (url in that case)
-
-			}, {
-				key: "getUrlNode",
-				value: function getUrlNode(url) {
-					var urlNode = document.createElement("span");
-					urlNode.innerHTML = url;
-					return urlNode;
-				}
-				// takes a service object and a target node
+				// takes a target node
 				// on click sends request based on actual service object state
 				// renders results inside target node
 
 			}, {
 				key: "getButtonNode",
-				value: function getButtonNode(service, targetNode) {
+				value: function getButtonNode(targetNode) {
 					var _this = this;
 
 					var buttonNode = document.createElement("button");
 					buttonNode.innerHTML = "Send request";
 					buttonNode.addEventListener("click", function () {
-						_this.sendRequest(service.selectedMethod, service.url + "." + service.selectedFormat).then(function (result) {
+						_this.sendRequest(_this.selectedMethod, _this.url + "." + _this.selectedFormat).then(function (result) {
 							targetNode.innerHTML = _this.prettifyResponse(result);
 						}).catch(function (error) {
 							targetNode.innerHTML = _this.prettifyResponse(error);
 						});
 					});
 					return buttonNode;
+				}
+				// returns a h2 with that title
+
+			}, {
+				key: "getHeaderNode",
+				value: function getHeaderNode() {
+					var headerNode = document.createElement("h2");
+					headerNode.innerHTML = this.name;
+					return headerNode;
 				}
 				// returns Pre tag, used as target node to render request result in it
 
@@ -959,53 +994,27 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 					var preNode = document.createElement("pre");
 					return preNode;
 				}
+			}, {
+				key: "getServiceDom",
+				value: function getServiceDom() {
+					var target = document.createElement("div");
+					var section = document.createElement("section");
+					var pre = this.getPreNode();
+
+					section.appendChild(this.getMethodNode());
+					section.appendChild(this.getUrlNode());
+					section.appendChild(this.getFormatNode());
+					section.appendChild(this.getButtonNode(pre));
+
+					target.appendChild(this.getHeaderNode());
+					target.appendChild(section);
+					target.appendChild(pre);
+					return target;
+				}
 			}]);
 
-			return App;
+			return Service;
 		}();
 
-		module.exports = App;
-	}, { "prismjs": 1 }], 3: [function (require, module, exports) {
-		var App = require("./api_ui");
-		var Service = require("./service");
-
-		var testService = new Service("Advertiser List", './../resources/response', 'GET', 'JSON', [{
-			alias: 'GET',
-			value: 'GET'
-		}], [{
-			alias: 'JSON',
-			value: 'JSON'
-		}, {
-			alias: 'XML',
-			value: 'XML'
-		}]);
-		var testApp = new App([testService]);
-
-		testApp.state.forEach(function (service) {
-			var container = document.getElementById("servicesContainer");
-
-			var section = document.createElement("section");
-			section.appendChild(testApp.getSelectNode({ context: service, options: "possibleMethods", parameter: "selectedMethod" }));
-			section.appendChild(testApp.getUrlNode(service.url));
-			section.appendChild(testApp.getSelectNode({ context: service, options: "possibleFormats", parameter: "selectedFormat" }));
-			var pre = testApp.getPreNode();
-			section.appendChild(testApp.getButtonNode(service, pre));
-
-			container.appendChild(testApp.getHeaderNode(service.name));
-			container.appendChild(section);
-			container.appendChild(pre);
-		});
-	}, { "./api_ui": 2, "./service": 4 }], 4: [function (require, module, exports) {
-		var Service = function Service(name, url, selectedMethod, selectedFormat, possibleMethods, possibleFormats) {
-			_classCallCheck(this, Service);
-
-			this.name = name;
-			this.url = url;
-			this.selectedMethod = selectedMethod;
-			this.selectedFormat = selectedFormat;
-			this.possibleMethods = possibleMethods;
-			this.possibleFormats = possibleFormats;
-		};
-
 		module.exports = Service;
-	}, {}] }, {}, [3]);
+	}, { "prismjs": 1 }] }, {}, [3]);
